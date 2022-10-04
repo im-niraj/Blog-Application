@@ -46,7 +46,7 @@ public class Controller {
         return new ResponseEntity<String>(postService.deletePostById(id), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/posts", params = {"pageNo", "pageSize", "sortBy"})
+    @GetMapping(value = "/posts", params = {"pageNo", "pageSize", "sortBy"} )
     public ResponseEntity<List<Post>> pageAndSort(@RequestParam int pageNo, @RequestParam int pageSize, @RequestParam String sortBy){
         return new ResponseEntity<List<Post>>(postService.pageAndSort(pageNo,pageSize,sortBy), HttpStatus.OK);
     }
