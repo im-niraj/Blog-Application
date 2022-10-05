@@ -31,7 +31,11 @@ public class CommentServiceImpl implements CommentService{
         Optional<Post> opt = postRepo.findById(postId);
         if(opt.isPresent()){
             if(opt.get().getComments().size()>0){
-              return commentRepo.findById(commentId).get();
+                Optional<Comment> opt1 = commentRepo.findById(commentId);
+                if(opt1.isPresent()){
+                    return opt1.get();
+                }
+                throw new BlogException("Comment id is invalid");
             }
             throw new BlogException("No comment available for this post");
         }
@@ -39,7 +43,7 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public String addCommentToPost(int postId, Comment comment) {
+    public String addCommentToPost(int postId, Comment comment) throws BlogException{
         Optional<Post> opt = postRepo.findById(postId);
         if(opt.isPresent()){
             comment.setPost(opt.get());
@@ -47,7 +51,7 @@ public class CommentServiceImpl implements CommentService{
             postRepo.save(opt.get());
             return "Comment added to the Post";
         }
-        return "Post id is not correct";
+       throw  new BlogException("Post Id is incorrect");
     }
 
     @Override
@@ -66,19 +70,24 @@ public class CommentServiceImpl implements CommentService{
 
 
     @Override
-    public String deleteCommentByIdBelongToPost(int postId, int commentId) {
+    public String deleteCommentByIdBelongToPost(int postId, int commentId) throws BlogException {
        Optional<Post> optPost = postRepo.findById(postId);
        if(optPost.isPresent()){
            Iterator itr = optPost.get().getComments().iterator();
            while (itr.hasNext()){
                Comment c = (Comment) itr.next();
-               if(c.getId() == commentId) itr.remove();
+               if(c.getId() == commentId){
+                   itr.remove();
+                   postRepo.save(optPost.get());
+                   commentRepo.deleteById(commentId);
+                   return "Comment deleted successfully..";
+               }
            }
-           postRepo.save(optPost.get());
-           commentRepo.deleteById(commentId);
-           return "Comment deleted successfully..";
+           if(optPost.get().getComments().size()>0){
+               throw new BlogException("No comment available for this comment id "+commentId);
+           }
+           throw new BlogException("No comment available");
        }
-
-       return "Post id is incorrect!";
+       throw new BlogException("Post id is incorrect!");
     }
 }

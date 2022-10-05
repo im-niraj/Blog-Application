@@ -1,5 +1,6 @@
 package blogapp.Service;
 
+import blogapp.Exceptions.BlogException;
 import blogapp.Model.Comment;
 import blogapp.Model.Post;
 import blogapp.Repo.CommentRepo;
@@ -28,8 +29,12 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public Post getPostById(int id) {
-        return postRepo.findById(id).get();
+    public Post getPostById(int id) throws BlogException{
+        Optional<Post> optionalPost = postRepo.findById(id);
+        if(optionalPost.isPresent()){
+            return optionalPost.get();
+        }
+        throw  new BlogException("Post id is incorrect");
     }
 
     @Override
@@ -39,11 +44,14 @@ public class PostServiceImpl implements PostService{
     }
 
     @Override
-    public Post updatePostById(Post post, int id) {
-        Post post1 = postRepo.findById(id).get();
-        post1.setTitle(post.getTitle());
-        post1.setDescription(post.getDescription());
-        return postRepo.save(post1);
+    public Post updatePostById(Post post, int id) throws BlogException{
+        Optional<Post> optionalPost = postRepo.findById(id);
+        if(optionalPost.isPresent()){
+            optionalPost.get().setTitle(post.getTitle());
+            optionalPost.get().setDescription(post.getDescription());
+            return postRepo.save(optionalPost.get());
+        }
+        throw  new BlogException("Post id is incorrect");
     }
 
     @Override
