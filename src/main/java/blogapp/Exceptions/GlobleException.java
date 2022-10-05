@@ -16,6 +16,7 @@ public class GlobleException {
         AllErrorDetails error = new AllErrorDetails();
         error.setTimeStamp(LocalDateTime.now());
         error.setDescription(wr.getDescription(false));
+        error.setMessage(blogEx.getMessage());
         return new ResponseEntity<AllErrorDetails>(error, HttpStatus.BAD_REQUEST);
     }
 
@@ -24,6 +25,7 @@ public class GlobleException {
         AllErrorDetails error = new AllErrorDetails();
         error.setTimeStamp(LocalDateTime.now());
         error.setDescription(wr.getDescription(false));
+        error.setMessage(blogEx.getMessage());
         return new ResponseEntity<AllErrorDetails>(error, HttpStatus.BAD_REQUEST);
     }
 
