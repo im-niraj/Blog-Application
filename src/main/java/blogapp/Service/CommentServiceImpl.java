@@ -20,22 +20,27 @@ public class CommentServiceImpl implements CommentService{
 
     @Override
     public List<Comment> getAllCommentOfPostById(int id) {
-        return commentRepo.getAllCommentByPostId(id);
+        return postRepo.findById(id).get().getComments();
     }
 
     @Override
     public Comment getCommentByIdBelongToPost(int postId, int commentId) {
-        return commentRepo.getCommentByIdBelongToPost(postId, commentId) ;
+        Optional<Post> opt = postRepo.findById(postId);
+        if(opt.isPresent()){
+            if(opt.get().getComments().size()>0){
+              return commentRepo.findById(commentId).get();
+            }
+        }
+        return  null;
     }
 
     @Override
     public String addCommentToPost(int postId, Comment comment) {
         Optional<Post> opt = postRepo.findById(postId);
         if(opt.isPresent()){
-            Comment comment1 = new Comment();
-            comment1.setComment(comment.getComment());
-            comment1.setPost_id(opt.get());
-            commentRepo.save(comment1);
+            comment.setPost(opt.get());
+            opt.get().getComments().add(commentRepo.save(comment));
+            postRepo.save(opt.get());
             return "Comment added to the Post";
         }
         return "Post id is not correct";
@@ -47,10 +52,8 @@ public class CommentServiceImpl implements CommentService{
         if(opt.isPresent()){
             Optional<Comment> opt1 = commentRepo.findById(commentId);
             if (opt1.isPresent()){
-                Comment comment1 =opt1.get();
-                comment1.setComment(comment.getComment());
-                commentRepo.save(comment1);
-                return comment1;
+                opt1.get().setComment(comment.getComment());
+                return commentRepo.save(opt1.get());
             }
         }
         return null;
@@ -60,12 +63,18 @@ public class CommentServiceImpl implements CommentService{
     public String deleteCommentByIdBelongToPost(int postId, int commentId) {
         Optional<Post> opt = postRepo.findById(postId);
         if(opt.isPresent()){
-            Optional<Comment> opt1 = commentRepo.findById(commentId);
-            if (opt1.isPresent()){
-                commentRepo.deleteById(commentId);
-                return "Comment deleted successfully..";
+            if (opt.get().getComments().size()>0){
+                Optional<Comment> optCom = commentRepo.findById(commentId);
+                if(optCom.isPresent()){
+                    commentRepo.deleteById(commentId);
+                    opt.get().getComments().remove(optCom.get());
+                    postRepo.save(opt.get());
+                    return "Comment deleted successfully..";
+                }
+
+                return "Comment id is incorrect";
             }
-            return "No comment found with id "+commentId;
+            return "This post does not have any comments";
         }
         return "Post id is not correct";
     }

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostServiceImpl implements PostService{
@@ -47,19 +48,23 @@ public class PostServiceImpl implements PostService{
 
     @Override
     public String deletePostById(int id) {
-        List<Comment> comments = commentRepo.getAllCommentByPostId(id);
-        if(comments.size()>0){
-            commentRepo.deleteByPostId(id);
+        Optional<Post> optPost = postRepo.findById(id);
+        if(optPost.isPresent()){
+            if(optPost.get().getComments().size() > 0){
+
+            }
             postRepo.deleteById(id);
             return "Post deleted successfully";
         }
-
-        postRepo.deleteById(id);
-        return "Post deleted successfully";
+        return "Post id is not correct";
     }
 
     @Override
     public List<Post> pageAndSort(int pageNo, int pageSize, String sortBy) {
+        if(sortBy == null){
+            Pageable pageable = PageRequest.of(pageNo, pageSize);
+            return postRepo.findAll(pageable).toList();
+        }
         Pageable pageable = PageRequest.of(pageNo, pageSize, Direction.DESC, sortBy);
         return postRepo.findAll(pageable).toList();
     }

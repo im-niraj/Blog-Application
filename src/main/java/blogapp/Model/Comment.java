@@ -1,6 +1,6 @@
 package blogapp.Model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,14 +23,13 @@ public class Comment {
 
     private String comment;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    @JsonIgnore
-    private Post post_id;
-
     @CreationTimestamp
     private LocalDateTime createdDateTime;
 
     @UpdateTimestamp
     private LocalDateTime updatedDateTime;
+
+    @ManyToOne
+    @JsonBackReference
+    private Post post;
 }

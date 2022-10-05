@@ -10,6 +10,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,4 +32,7 @@ public class Post {
 
     @UpdateTimestamp
     private LocalDateTime updatedDateTime;
+
+    @OneToMany
+    private List<Comment> comments = new ArrayList<>();
 }
