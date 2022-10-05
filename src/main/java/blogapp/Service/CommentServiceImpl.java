@@ -1,5 +1,6 @@
 package blogapp.Service;
 
+import blogapp.Exceptions.BlogException;
 import blogapp.Model.Comment;
 import blogapp.Model.Post;
 import blogapp.Repo.CommentRepo;
@@ -26,14 +27,15 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public Comment getCommentByIdBelongToPost(int postId, int commentId) {
+    public Comment getCommentByIdBelongToPost(int postId, int commentId) throws BlogException{
         Optional<Post> opt = postRepo.findById(postId);
         if(opt.isPresent()){
             if(opt.get().getComments().size()>0){
               return commentRepo.findById(commentId).get();
             }
+            throw new BlogException("No comment available for this post");
         }
-        return  null;
+        throw new BlogException("Post id is not correct");
     }
 
     @Override
@@ -49,7 +51,7 @@ public class CommentServiceImpl implements CommentService{
     }
 
     @Override
-    public Comment updateCommentByIdBelongToPost(int postId, int commentId, Comment comment) {
+    public Comment updateCommentByIdBelongToPost(int postId, int commentId, Comment comment) throws BlogException{
         Optional<Post> opt = postRepo.findById(postId);
         if(opt.isPresent()){
             Optional<Comment> opt1 = commentRepo.findById(commentId);
@@ -57,8 +59,9 @@ public class CommentServiceImpl implements CommentService{
                 opt1.get().setComment(comment.getComment());
                 return commentRepo.save(opt1.get());
             }
+            throw new BlogException("No comment available for this id "+commentId);
         }
-        return null;
+       throw new BlogException("Post id is not correct");
     }
 
 
