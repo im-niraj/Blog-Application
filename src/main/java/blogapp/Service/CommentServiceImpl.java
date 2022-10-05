@@ -69,6 +69,7 @@ public class CommentServiceImpl implements CommentService{
     }
 
 
+    @Transactional
     @Override
     public String deleteCommentByIdBelongToPost(int postId, int commentId) throws BlogException {
        Optional<Post> optPost = postRepo.findById(postId);

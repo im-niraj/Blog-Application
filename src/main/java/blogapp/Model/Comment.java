@@ -29,7 +29,7 @@ public class Comment {
     @UpdateTimestamp
     private LocalDateTime updatedDateTime;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JsonBackReference
     private Post post;
 }

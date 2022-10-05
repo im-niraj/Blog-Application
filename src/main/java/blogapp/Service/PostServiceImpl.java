@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,17 +56,23 @@ public class PostServiceImpl implements PostService{
         throw  new BlogException("Post id is incorrect");
     }
 
+
     @Override
-    public String deletePostById(int id) {
+    public String deletePostById(int id) throws BlogException{
         Optional<Post> optPost = postRepo.findById(id);
         if(optPost.isPresent()){
-            if(optPost.get().getComments().size() > 0){
-
+            Iterator itr = optPost.get().getComments().iterator();
+            while(itr.hasNext()){
+                Comment c = (Comment) itr.next();
+                itr.remove();
+                commentRepo.deleteById(c.getId());
             }
+            postRepo.save(optPost.get());
             postRepo.deleteById(id);
             return "Post deleted successfully";
         }
-        return "Post id is not correct";
+
+        throw new BlogException("Post id is not correct");
     }
 
     @Override
