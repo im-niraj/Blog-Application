@@ -7,6 +7,8 @@ import blogapp.Repo.PostRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,23 +61,21 @@ public class CommentServiceImpl implements CommentService{
         return null;
     }
 
+
     @Override
     public String deleteCommentByIdBelongToPost(int postId, int commentId) {
-        Optional<Post> opt = postRepo.findById(postId);
-        if(opt.isPresent()){
-            if (opt.get().getComments().size()>0){
-                Optional<Comment> optCom = commentRepo.findById(commentId);
-                if(optCom.isPresent()){
-                    commentRepo.deleteById(commentId);
-                    opt.get().getComments().remove(optCom.get());
-                    postRepo.save(opt.get());
-                    return "Comment deleted successfully..";
-                }
+       Optional<Post> optPost = postRepo.findById(postId);
+       if(optPost.isPresent()){
+           Iterator itr = optPost.get().getComments().iterator();
+           while (itr.hasNext()){
+               Comment c = (Comment) itr.next();
+               if(c.getId() == commentId) itr.remove();
+           }
+           postRepo.save(optPost.get());
+           commentRepo.deleteById(commentId);
+           return "Comment deleted successfully..";
+       }
 
-                return "Comment id is incorrect";
-            }
-            return "This post does not have any comments";
-        }
-        return "Post id is not correct";
+       return "Post id is incorrect!";
     }
 }
