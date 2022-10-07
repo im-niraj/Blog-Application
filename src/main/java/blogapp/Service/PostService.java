@@ -1,5 +1,6 @@
 package blogapp.Service;
 
+import blogapp.DTO.PostDTO;
 import blogapp.Model.Post;
 
 import java.util.List;
