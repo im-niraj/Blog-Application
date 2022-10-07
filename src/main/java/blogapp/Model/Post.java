@@ -33,6 +33,6 @@ public class Post {
     @UpdateTimestamp
     private LocalDateTime updatedDateTime;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 }
