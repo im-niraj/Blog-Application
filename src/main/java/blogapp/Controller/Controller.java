@@ -1,17 +1,16 @@
 package blogapp.Controller;
 
 import blogapp.DTO.PostDTO;
-import blogapp.Model.Comment;
+import blogapp.Exceptions.BlogException;
 import blogapp.Model.Post;
-import blogapp.Service.CommentService;
 import blogapp.Service.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,12 +40,12 @@ public class Controller {
     }
 
     @PostMapping("/posts")
-    public ResponseEntity<String> createPost(@RequestBody PostDTO postDTO){
+    public ResponseEntity<String> createPost(@Valid @RequestBody PostDTO postDTO) {
         Post post = modelMapper.map(postDTO, Post.class);
         return new ResponseEntity<>(postService.createPost(post), HttpStatus.CREATED);
     }
     @PutMapping("/posts/{id}")
-    public ResponseEntity<PostDTO> updatePostById(@RequestBody PostDTO postDTO, @PathVariable int id){
+    public ResponseEntity<PostDTO> updatePostById(@RequestBody @Valid PostDTO postDTO, @PathVariable int id){
         Post post = modelMapper.map(postDTO, Post.class);
         PostDTO postResponse= modelMapper.map(postService.updatePostById(post,id), PostDTO.class);
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
